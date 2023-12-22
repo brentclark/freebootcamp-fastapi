@@ -8,7 +8,6 @@ class Products(SQLModel, table=True):
     price: SQLModel.Float(4,4)
     is_sale: SQLModel.Boolean(default=True)
 
-
 hero_1 = Products(name="Deadpond", price=1.2)
 hero_2 = Products(name="Deadpond", price=1.2)
 hero_3 = Products(name="Deadpond", price=1.2)
