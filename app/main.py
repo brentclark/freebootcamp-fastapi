@@ -31,7 +31,7 @@ def read_all_posts():
         return posts
 
 # Get - A post
-@app.get("/posts/{post_id}")
+@app.get("/posts/{post_id}", status_code=status.HTTP_404_NOT_FOUND)
 def read_a_post(post_id: int):
     with Session(engine) as session:
         statement = select(Posts).where(Posts.id == post_id)
@@ -39,7 +39,7 @@ def read_a_post(post_id: int):
         post = result.first() 
 
         if not post:
-            raise HTTPException(status_code=404, detail=f"ID {post_id}, not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"ID {post_id}, not found")
 
         return {
             "id": post
