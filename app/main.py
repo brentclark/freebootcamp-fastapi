@@ -37,12 +37,16 @@ def read_a_post(post_id: int):
         statement = select(Posts).where(Posts.id == post_id)
         result = session.exec(statement)
         post = result.first() 
+
+        if not post:
+            raise HTTPException(status_code=404, detail=f"ID {post_id}, not found")
+
         return {
             "id": post
         }
 
 # Post
-@app.post("/posts/", response_model=Posts)
+@app.post("/posts/", response_model=Posts, status_code=HTTP_201_CREATED)
 def create_post(post: Posts):
     print(post)
     with Session(engine) as session:
