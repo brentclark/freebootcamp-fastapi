@@ -1,98 +1,80 @@
 from typing import Optional, List
-from fastapi import FastAPI, Response, status, HTTPException
+from fastapi import FastAPI, Response, status, HTTPException, Depends
+from sqlalchemy.orm import Session
 from datetime import datetime
-from sqlmodel import Field, Session, SQLModel, create_engine, select
+from pydantic import BaseModel
 
-class Posts(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
-    title: str
-    content: str
-    published: bool = Field(default=True, nullable=False)
-    created_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
+from . import models
+from .database import engine, get_db
 
-
-sqlite_file_name = "posts.db"
-sqlite_url = f"sqlite:///{sqlite_file_name}"
-
-connect_args = {"check_same_thread": False}
-engine = create_engine(sqlite_url, echo=True, connect_args=connect_args)
-
+models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
-
-@app.get("/")
-def root():
-    return {"message": "Check /redoc or /docs"}
-
-
-# Get - All posts
-@app.get("/posts/", response_model=List[Posts])
-def read_all_posts():
-    with Session(engine) as session:
-        posts = session.exec(select(Posts)).all()
-        return posts
+class Posts(BaseModel):
+    title: str
+    content: str
+    published: bool = True
 
 
-# Get - A post
+@app.get("/posts")
+def get_posts(db: Session = Depends(get_db)):
+    posts = db.query(models.Posts).all()
+
+    if not posts:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"No posts found"
+        )
+    return {"data": posts}
+
+
 @app.get("/posts/{post_id}")
-def read_a_post(post_id: int):
-    with Session(engine) as session:
-        statement = select(Posts).where(Posts.id == post_id)
-        result = session.exec(statement)
-        post = result.first()
+def read_a_post(post_id: int, db: Session = Depends(get_db)):
+    post = db.query(models.Posts).filter(models.Posts.id == post_id).first()
 
-        if not post:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail=f"ID {post_id}, not found"
-            )
+    if not post:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"ID {post_id}, not found"
+        )
 
-        return {"id": post}
+    return {"data": post}
 
 
-# Post
-@app.post("/posts/", response_model=Posts, status_code=status.HTTP_201_CREATED)
-def create_post(post: Posts):
-    with Session(engine) as session:
-        session.add(post)
-        session.commit()
-        session.refresh(post)
-        return post
+@app.post("/posts", status_code=status.HTTP_201_CREATED)
+def create_post(post: Posts, db: Session = Depends(get_db)):
+    create_post = models.Posts(**post.model_dump())
+    db.add(create_post)
+    db.commit()
+    db.refresh(create_post)
+    return create_post
 
-# Update id
+
 @app.patch("/posts/{post_id}", response_model=Posts)
-def update_post(post_id: int, post: Posts):
-    with Session(engine) as session:
-        statement = select(Posts).where(Posts.id == post_id)
-        result = session.exec(statement)
-        update_post = result.first()
+def update_post(post_id: int, post: Posts, db: Session = Depends(get_db)):
+    update_post = db.query(models.Posts).filter(models.Posts.id == post_id).first()
 
-        if not update_post:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail=f"ID {post_id}, not found"
-            )
+    if not post:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"ID {post_id}, not found"
+        )
 
-        for key, value in post.model_dump(exclude_unset=True).items():
-            setattr(update_post, key, value)
+    for key, value in post.model_dump(exclude_unset=True).items():
+        setattr(update_post, key, value)
 
-        session.add(update_post)
-        session.commit()
-        session.refresh(update_post)
-        return update_post
+    db.add(update_post)
+    db.commit()
+    db.refresh(update_post)
+    return update_post
 
 
-# Delete - A post
 @app.delete("/posts/{post_id}")
-def delete_a_post(post_id: int):
-    with Session(engine) as session:
-        statement = select(Posts).where(Posts.id == post_id)
-        result = session.exec(statement)
-        post = result.first()
+def delete_post(post_id: int, db: Session = Depends(get_db)):
+    delete_post = db.query(models.Posts).filter(models.Posts.id == post_id).first()
 
-        if not post:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail=f"ID {post_id}, not found"
-            )
+    if not delete_post:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"ID {post_id}, not found"
+        )
 
-        session.delete(post)
-        session.commit()
-        return {"ok": True}
+    db.delete(delete_post)
+    db.commit()
+    return {"ok": True}
