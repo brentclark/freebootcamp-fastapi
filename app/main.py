@@ -10,7 +10,7 @@ models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 
-@app.get("/posts")
+@app.get("/posts", response_model=List[Post])
 def get_posts(db: Session = Depends(get_db)):
     posts = db.query(models.Posts).all()
 
