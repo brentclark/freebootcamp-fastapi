@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Boolean
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.sql.expression import text
+from sqlalchemy_utils import EmailType, PasswordType
 from .database import Base
 
 
@@ -11,6 +12,24 @@ class Posts(Base):
     title = Column(String, nullable=False)
     content = Column(String, nullable=False)
     published = Column(Boolean, server_default="TRUE", nullable=False)
+    created_at = Column(
+        TIMESTAMP(timezone=True), nullable=False, server_default=text("(now())")
+    )
+
+
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, nullable=False)
+    email = Column(EmailType, nullable=False, unique=True)
+    password = Column(
+        PasswordType(
+            schemes=["pbkdf2_sha512", "md5_crypt"],
+            deprecated=["md5_crypt"],
+            pbkdf2_sha512__rounds=600_000,
+        ),
+        unique=False,
+        nullable=False,
+    )
     created_at = Column(
         TIMESTAMP(timezone=True), nullable=False, server_default=text("(now())")
     )

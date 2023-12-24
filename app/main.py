@@ -1,10 +1,21 @@
-from typing import Optional, List
+from typing import Optional, List, Dict
 from fastapi import FastAPI, Response, status, HTTPException, Depends
 from sqlalchemy.orm import Session
+from passlib.context import CryptContext
 
 from . import models
 from .database import engine, get_db
-from .schemas import Post, PostCreate, PostUpdate, PostCreateReponse
+from .schemas import (
+    Post,
+    PostCreate,
+    PostUpdate,
+    PostCreateReponse,
+    UserCreate,
+    UserResponse,
+    User,
+)
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
@@ -73,3 +84,46 @@ def delete_post(post_id: int, db: Session = Depends(get_db)):
 
     db.delete(delete_post)
     db.commit()
+
+
+#
+# --------------------- Users ------------------------------
+#
+
+
+@app.get("/users")
+def get_posts(db: Session = Depends(get_db)):
+    users = db.query(models.User).all()
+
+    if not users:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"No users found"
+        )
+    return users
+
+
+@app.post("/users", status_code=status.HTTP_201_CREATED, response_model=UserResponse)
+def create_user(user: UserCreate, db: Session = Depends(get_db)):
+    # Make sure email does not already exist
+    check_user = db.query(models.User).filter(models.User.email == user.email).first()
+    if check_user is not None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"Email already exists"
+        )
+
+    create_user = models.User(**user.model_dump())
+    db.add(create_user)
+    db.commit()
+    db.refresh(create_user)
+    return create_user
+
+@app.get('/users/{id}', response_model=User)
+def get_user(id: int, db: Session = Depends(get_db)):
+    u = db.query(models.User).filter(models.User.id == id).first()
+
+    if not u:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"User with {id} not found"
+        )
+        
+    return u
