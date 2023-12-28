@@ -7,7 +7,7 @@ from datetime import timedelta
 
 router = APIRouter(prefix="/login", tags=["Authentication"])
 
-@router.post("/")
+@router.post("/", response_model=schemas.Token)
 def login(
     user_credentials: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(database.get_db),

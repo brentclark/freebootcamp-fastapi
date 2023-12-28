@@ -2,19 +2,27 @@ from pydantic import BaseModel, EmailStr, Field, ValidationError, validator
 from datetime import datetime
 from typing import Optional
 
+
 class Post(BaseModel):
+    """Post"""
     title: str
     content: str
     published: Optional[bool] = True
     created_at: Optional[datetime] = datetime.now()
 
+
 class PostCreate(Post):
+    """PostCreate"""
     pass
+
 
 class PostUpdate(Post):
+    """PostUpdate"""
     pass
 
-class PostCreateReponse(BaseModel):
+class PostCreateResponse(BaseModel):
+    """PostCreateResponse"""
+
     title: str
     content: str
     # published: bool
@@ -25,6 +33,8 @@ class PostCreateReponse(BaseModel):
 
 
 class UserCreate(BaseModel):
+    """UserCreate"""
+
     email: EmailStr | None = Field(default=None)
     password: str
     created_at: Optional[datetime] = datetime.now()
@@ -46,7 +56,9 @@ class UserCreate(BaseModel):
     class Config:
         orm_mode = True
 
+
 class UserResponse(BaseModel):
+    """UserResponse"""
     id: int
     email: EmailStr
     created_at: datetime
@@ -54,15 +66,20 @@ class UserResponse(BaseModel):
     class Config:
         orm_mode = True
 
-        
+
 class UserLogin(BaseModel):
+    """UserLogin"""
     email: EmailStr
     password: str
 
-    
+
 class Token(BaseModel):
+    """Token"""
     access_token: str
     token_type: str
 
+
 class TokenData(BaseModel):
-    id: Optional[str] = None
+    """TokenData"""
+    id: int = None
+    user_email: str = None
