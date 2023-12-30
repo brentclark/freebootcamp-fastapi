@@ -12,5 +12,5 @@ sqlite3 create_database.db < create_database.sql
 uvicorn app.main:app --reload
 
 python3 -m pip list -o | awk '{if(NR>=3)print}'
-ython3 -m pip list -o | awk '{if(NR>=3)print}' | cut -d' ' -f1 | xargs -n1 python3 -m pip install --upgrade --force-reinstall
+python3 -m pip list -o | awk '{if(NR>=3)print}' | cut -d' ' -f1 | xargs -n1 python3 -m pip install --upgrade --force-reinstall
 

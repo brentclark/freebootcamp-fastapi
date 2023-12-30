@@ -2,6 +2,7 @@ from pydantic import BaseModel, EmailStr, Field, ValidationError, validator
 from datetime import datetime
 from typing import Optional
 
+
 class UserCreate(BaseModel):
     """UserCreate"""
 
@@ -24,27 +25,30 @@ class UserCreate(BaseModel):
         return value
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class UserResponse(BaseModel):
     """UserResponse"""
+
     id: int
     email: EmailStr
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class UserLogin(BaseModel):
     """UserLogin"""
+
     email: EmailStr
     password: str
 
 
 class Post(BaseModel):
     """Post"""
+
     id: int
     title: str
     content: str
@@ -53,8 +57,10 @@ class Post(BaseModel):
     user_id: Optional[int]
     user: Optional[UserResponse]
 
+
 class PostCreate(Post):
     """PostCreate"""
+
     id: Optional[int]
     user_id: Optional[int]
     pass
@@ -62,7 +68,9 @@ class PostCreate(Post):
 
 class PostUpdate(Post):
     """PostUpdate"""
+
     pass
+
 
 class PostCreateResponse(BaseModel):
     """PostCreateResponse"""
@@ -75,18 +83,18 @@ class PostCreateResponse(BaseModel):
     user_id: int
 
     class Config:
-        orm_mode = True
-
-
+        from_attributes = True
 
 
 class Token(BaseModel):
     """Token"""
+
     access_token: str
     token_type: str
 
 
 class TokenData(BaseModel):
     """TokenData"""
+
     id: int = None
     user_email: str = None
