@@ -45,16 +45,18 @@ class UserLogin(BaseModel):
 
 class Post(BaseModel):
     """Post"""
+    id: int
     title: str
     content: str
     published: Optional[bool] = True
     created_at: Optional[datetime] = datetime.now()
-    user_id: int
-    user: UserResponse
+    user_id: Optional[int]
+    user: Optional[UserResponse]
 
 class PostCreate(Post):
     """PostCreate"""
-    #user_id: int
+    id: Optional[int]
+    user_id: Optional[int]
     pass
 
 

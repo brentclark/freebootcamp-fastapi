@@ -1,6 +1,6 @@
-from typing import List
-from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
-from sqlalchemy.orm import Session, object_mapper
+from typing import List, Optional
+from fastapi import status, HTTPException, Depends, APIRouter
+from sqlalchemy.orm import Session
 from .. import models, schemas, oauth2
 from ..database import get_db
 
@@ -11,10 +11,21 @@ router = APIRouter(prefix="/posts", tags=["Posts"])
 def get_posts(
     db: Session = Depends(get_db),
     current_user: str = Depends(oauth2.get_current_user),
-    ):
-    print(db.query(models.Posts))
-    posts = db.query(models.Posts).all()
-    #posts = db.query(models.Posts).filter(models.Posts.user_id == current_user.id).all()
+    limit: int = 10,
+    skip: int = 0,
+    search: Optional[str] = "",
+):
+    #search_str = "%{}%".format(search)
+    posts = (
+        db.query(models.Posts)
+        .filter(models.Posts.title.contains(search))
+        .limit(limit=limit)
+        .offset(skip)
+        .all()
+    )
+    # posts = db.query(models.Posts).limit(limit=limit).offset(skip).all()
+    # posts = db.query(models.Posts).all()
+    # posts = db.query(models.Posts).filter(models.Posts.user_id == current_user.id).all()
 
     if not posts:
         raise HTTPException(
@@ -22,19 +33,19 @@ def get_posts(
         )
 
     # if posts.user_id != current_user.id:
-        # raise HTTPException(
-            # status_code=status.HTTP_403_FORBIDDEN, detail="User not authorised to view posts"
-        # )
+    # raise HTTPException(
+    # status_code=status.HTTP_403_FORBIDDEN, detail="User not authorised to view posts"
+    # )
 
     return posts
 
 
 @router.get("/{post_id}", response_model=schemas.Post)
 def read_a_post(
-    post_id: int, 
+    post_id: int,
     db: Session = Depends(get_db),
-    current_user: str = Depends(oauth2.get_current_user)
-    ):
+    current_user: str = Depends(oauth2.get_current_user),
+):
     post = db.query(models.Posts).filter(models.Posts.id == post_id).first()
 
     if not post:
@@ -43,9 +54,9 @@ def read_a_post(
         )
 
     # if post.user_id != current_user.id:
-        # raise HTTPException(
-            # status_code=status.HTTP_403_FORBIDDEN, detail=f"User not authorised to view post {id}"
-        # )
+    # raise HTTPException(
+    # status_code=status.HTTP_403_FORBIDDEN, detail=f"User not authorised to view post {id}"
+    # )
 
     return post
 
@@ -85,7 +96,8 @@ def update_post(
 
     if update_post.id != current_user.id:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail=f"User not authorised to update post {update_post.id}"
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"User not authorised to update post {update_post.id}",
         )
 
     for key, value in post.model_dump(exclude_unset=True).items():
@@ -110,17 +122,17 @@ def delete_post(
             status_code=status.HTTP_404_NOT_FOUND, detail=f"ID {post_id}, not found"
         )
 
-    #Iterate over the attributes of the object and print their names and values
+    # Iterate over the attributes of the object and print their names and values
     # mapper = object_mapper(delete_post)
     # for column in mapper.columns:
-        # attribute_name = column.key
-        # attribute_value = getattr(delete_post, attribute_name)
-        # print(f"{attribute_name}: {attribute_value}")
+    # attribute_name = column.key
+    # attribute_value = getattr(delete_post, attribute_name)
+    # print(f"{attribute_name}: {attribute_value}")
 
     if delete_post.id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"User not authorised to delete post {delete_post.id}"
+            detail=f"User not authorised to delete post {delete_post.id}",
         )
 
     db.delete(delete_post)
