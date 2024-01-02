@@ -15,7 +15,7 @@ def get_posts(
     skip: int = 0,
     search: Optional[str] = "",
 ):
-    #search_str = "%{}%".format(search)
+    # search_str = "%{}%".format(search)
     posts = (
         db.query(models.Posts)
         .filter(models.Posts.title.contains(search))

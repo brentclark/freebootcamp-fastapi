@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr, Field, ValidationError, validator
+from enum import Enum, IntEnum
 from datetime import datetime
 from typing import Optional
 
@@ -98,3 +99,22 @@ class TokenData(BaseModel):
 
     id: int = None
     user_email: str = None
+
+
+#
+# ---------------------------- Vote -----------------------------
+#
+
+
+class VoteDirection(IntEnum):
+    """Vote Direction"""
+
+    nolike = 0
+    like = 1
+
+
+class Vote(BaseModel):
+    """Vote"""
+
+    post_id: int
+    direction: VoteDirection

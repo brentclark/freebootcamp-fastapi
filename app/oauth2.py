@@ -8,6 +8,7 @@ from app.config import settings
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
+
 def create_access_token(data: dict) -> str:
     """create access token"""
     to_encode = data.copy()
@@ -20,10 +21,8 @@ def verify_access_token(token: str, credentials_exception) -> str:
     """verify access token"""
     try:
         payload = jwt.decode(
-            token,
-            settings.SECRET_KEY,
-            algorithms=[settings.ALGORITHM]
-            )
+            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )
         id: int = payload.get("user_id")
         user_email: str = payload.get("user_email")
 
