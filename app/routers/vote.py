@@ -16,6 +16,15 @@ def create_vote(
     db: Session = Depends(get_db),
     current_user: str = Depends(oauth2.get_current_user),
 ):
+    # Check post does exist in table Posts.
+    posts = db.query(models.Posts).filter(models.Posts.id == vote.post_id).all()
+    if not posts:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Post {vote.post_id} does not exist",
+        )
+
+    # Check if there is not already an entry in the Vote table
     vote_query = db.query(models.Vote).filter(
         models.Vote.post_id == vote.post_id, models.Vote.user_id == current_user.id
     )

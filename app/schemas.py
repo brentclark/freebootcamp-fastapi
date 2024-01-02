@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field, ValidationError, validator
+from pydantic import BaseModel, EmailStr, Field, ValidationError, validator, ConfigDict
 from enum import Enum, IntEnum
 from datetime import datetime
 from typing import Optional
@@ -47,9 +47,10 @@ class UserLogin(BaseModel):
     password: str
 
 
+
+
 class Post(BaseModel):
     """Post"""
-
     id: int
     title: str
     content: str
@@ -58,11 +59,14 @@ class Post(BaseModel):
     user_id: Optional[int]
     user: Optional[UserResponse]
 
+    class Config:
+        from_attributes = True
+
 
 class PostCreate(Post):
     """PostCreate"""
 
-    id: Optional[int]
+    # id: Optional[int]
     user_id: Optional[int]
     pass
 
@@ -118,3 +122,11 @@ class Vote(BaseModel):
 
     post_id: int
     direction: VoteDirection
+
+class PostOut(BaseModel):
+    """Post"""
+    Posts: Post
+    votes: int
+
+    class Config:
+        from_attributes = True

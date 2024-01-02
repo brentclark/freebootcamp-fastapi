@@ -1,13 +1,16 @@
 from typing import List, Optional
 from fastapi import status, HTTPException, Depends, APIRouter
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, mapper
+from sqlalchemy import func
 from .. import models, schemas, oauth2
 from ..database import get_db
 
 router = APIRouter(prefix="/posts", tags=["Posts"])
 
 
-@router.get("/", response_model=List[schemas.Post])
+# @router.get("/")
+# @router.get("/", response_model=List[schemas.P])
+@router.get("/", response_model=List[schemas.PostOut])
 def get_posts(
     db: Session = Depends(get_db),
     current_user: str = Depends(oauth2.get_current_user),
@@ -15,17 +18,15 @@ def get_posts(
     skip: int = 0,
     search: Optional[str] = "",
 ):
-    # search_str = "%{}%".format(search)
     posts = (
-        db.query(models.Posts)
+        db.query(models.Posts, func.count(models.Vote.post_id).label("votes"))
+        .join(models.Vote, models.Vote.post_id == models.Posts.id, isouter=True)
+        .group_by(models.Posts.id)
         .filter(models.Posts.title.contains(search))
         .limit(limit=limit)
         .offset(skip)
         .all()
     )
-    # posts = db.query(models.Posts).limit(limit=limit).offset(skip).all()
-    # posts = db.query(models.Posts).all()
-    # posts = db.query(models.Posts).filter(models.Posts.user_id == current_user.id).all()
 
     if not posts:
         raise HTTPException(
@@ -40,13 +41,19 @@ def get_posts(
     return posts
 
 
-@router.get("/{post_id}", response_model=schemas.Post)
+@router.get("/{post_id}", response_model=schemas.PostOut)
 def read_a_post(
     post_id: int,
     db: Session = Depends(get_db),
     current_user: str = Depends(oauth2.get_current_user),
 ):
-    post = db.query(models.Posts).filter(models.Posts.id == post_id).first()
+    post = (
+        db.query(models.Posts, func.count(models.Vote.post_id).label("votes"))
+        .join(models.Vote, models.Vote.post_id == models.Posts.id, isouter=True)
+        .group_by(models.Posts.id)
+        .filter(models.Posts.id == post_id)
+        .first()
+    )
 
     if not post:
         raise HTTPException(
