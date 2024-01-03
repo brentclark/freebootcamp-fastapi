@@ -63,12 +63,12 @@ class Post(BaseModel):
         from_attributes = True
 
 
-class PostCreate(Post):
+class PostCreate(BaseModel):
     """PostCreate"""
-
-    # id: Optional[int]
-    user_id: Optional[int]
-    pass
+    title: str
+    content: str
+    published: Optional[bool] = True
+    created_at: Optional[datetime] = datetime.now()
 
 
 class PostUpdate(Post):
