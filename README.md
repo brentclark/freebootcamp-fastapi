@@ -1,6 +1,6 @@
 # freebootcamp-fastapi
+## Some python commands
 ```
-Run
 python3 -m venv venv
 source venv/bin/activate
 python3 -m pip install -r requirements.txt
@@ -15,14 +15,14 @@ python3 -m pip list -o | awk '{if(NR>=3)print}'
 python3 -m pip list -o | awk '{if(NR>=3)print}' | cut -d' ' -f1 | xargs -n1 python3 -m pip install --upgrade --force-reinstall
 ```
 
-# Docker Commnand
+## Docker Commnand
 
 ```
 docker build -t my-freebootcamp-fastapi-app . 
 docker run -it -p 8000:8000 --rm --name my-freebootcamp-fastapi-app my-freebootcamp-fastapi-app
 ```
 
-# Create a app/.env file with the following ENV variables.
+## Create a app/.env file with the following ENV variables.
 
 ```
 SQLALCHEMY_DATABASE_URL = "sqlite:///./posts.db"
