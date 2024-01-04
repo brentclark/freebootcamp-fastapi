@@ -14,3 +14,8 @@ uvicorn app.main:app --reload
 python3 -m pip list -o | awk '{if(NR>=3)print}'
 python3 -m pip list -o | awk '{if(NR>=3)print}' | cut -d' ' -f1 | xargs -n1 python3 -m pip install --upgrade --force-reinstall
 
+# Create a app/.env file with the following ENV variables.
+SQLALCHEMY_DATABASE_URL = "sqlite:///./posts.db"
+SECRET_KEY = "YOUR_SECRET_KEY"
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60

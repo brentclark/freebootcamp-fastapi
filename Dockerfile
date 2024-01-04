@@ -8,17 +8,23 @@ WORKDIR /app
 # Clone the Git repository
 RUN git clone https://github.com/brentclark/freebootcamp-fastapi.git .
 
+# Copy the ENV file.
+COPY app/.env ./app
+
 # Upgrade pip
-RUN pip install --upgrade pip
+RUN pip install --no-cache-dir --upgrade pip
 
 # Install any dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Install SQLite libraries
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    sqlite3 \
+    libsqlite3-dev && \
+    rm -rf /var/lib/apt/lists/*
+
 # Expose the port that Gunicorn will run on
 EXPOSE 8000
 
-# Define environment variables
-ENV APP_MODULE=app.main:app
-
-# Command to run the application using Gunicorn
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8000", "--log-level", "info", "${APP_MODULE}"]
+# Command to run the application using uvicorn
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
