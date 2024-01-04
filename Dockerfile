@@ -8,9 +8,6 @@ WORKDIR /app
 # Clone the Git repository
 RUN git clone https://github.com/brentclark/freebootcamp-fastapi.git .
 
-# Copy the ENV file.
-COPY app/.env ./app
-
 # Upgrade pip
 RUN pip install --no-cache-dir --upgrade pip
 
