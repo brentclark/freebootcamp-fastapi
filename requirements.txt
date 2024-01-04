@@ -11,6 +11,7 @@ ecdsa
 email-validator
 fastapi
 greenlet
+gunicorn
 h11
 httpcore
 httptools
@@ -22,6 +23,7 @@ Jinja2
 Mako
 MarkupSafe
 orjson
+packaging
 passlib
 pyasn1
 pycparser
