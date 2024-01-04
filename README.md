@@ -20,9 +20,13 @@ python3 -m pip list -o | awk '{if(NR>=3)print}' | cut -d' ' -f1 | xargs -n1 pyth
 ```
 docker build -t my-freebootcamp-fastapi-app . 
 docker run -it -p 8000:8000 --rm --name my-freebootcamp-fastapi-app my-freebootcamp-fastapi-app
+
+docker compose -f docker-compose.yml -p my-freebootcamp-fastapi-app up -d
+docker compose -f docker-compose.yml -p my-freebootcamp-fastapi-app logs -f
+docker compose -f docker-compose.yml -p my-freebootcamp-fastapi-app down
 ```
 
-## Create a app/.env file with the following ENV variables.
+## Create a app/.env file with the following ENV variables for docker compose.
 
 ```
 SQLALCHEMY_DATABASE_URL = "sqlite:///./posts.db"
