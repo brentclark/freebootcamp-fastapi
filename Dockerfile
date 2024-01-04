@@ -2,8 +2,15 @@
 FROM python:3
 LABEL maintainer="Brent Clark <brentgclark@gmail.com>"
 
-# Set the working directory to /app
-WORKDIR /app
+ARG UID=1000
+ARG GID=1000
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN groupadd --force --gid $GID app \
+    && useradd --non-unique --home-dir /opt/app --create-home --uid $UID --gid $GID --comment "Application" app
+
+# Set the working directory to /opt/app
+WORKDIR /opt/app
 
 # Clone the Git repository
 RUN git clone https://github.com/brentclark/freebootcamp-fastapi.git .
@@ -23,5 +30,6 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
 # Expose the port that Gunicorn will run on
 EXPOSE 8000
 
+USER app
 # Command to run the application using uvicorn
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
