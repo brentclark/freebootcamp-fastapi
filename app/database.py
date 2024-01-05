@@ -7,7 +7,7 @@ engine = create_engine(
     settings.SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
 )
 
-print(f"mysql+pymysql://{settings.MYSQL_USER}:{settings.MYSQL_PASSWORD}@{settings.MYSQL_HOST}/{settings.MYSQL_DATABASE}?charset=utf8mb4")
+print(f"BRENT {settings.MYSQL_USER}")
 
 engine = create_engine(
     "mysql+pymysql://{settings.MYSQL_USER}:{settings.MYSQL_PASSWORD}@{settings.MYSQL_HOST}/{settings.MYSQL_DATABASE}?charset=utf8mb4"
