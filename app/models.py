@@ -56,7 +56,6 @@ class User(Base):
     password = Column(String, nullable=False, default="")
     ptype = Column(Enum(PasswordType), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    )
     # posts = relationship("Posts", back_populates="user", cascade="all, delete-orphan")
 
     def check_password(self, plain: str) -> bool:
