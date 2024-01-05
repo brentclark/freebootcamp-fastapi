@@ -15,7 +15,6 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
 RUN groupadd --force --gid $GID app \
     && useradd --non-unique --home-dir /opt/app --create-home --uid $UID --gid $GID --comment "Application" app
 
-USER app
 
 # Set the working directory to /opt/app
 WORKDIR /opt/app/fastapi
@@ -32,5 +31,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Expose the port that Gunicorn will run on
 EXPOSE 8000
 
+#USER app
 # Command to run the application using uvicorn
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
