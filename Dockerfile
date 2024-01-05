@@ -2,6 +2,8 @@
 FROM python:3
 LABEL maintainer="Brent Clark <brentgclark@gmail.com>"
 
+RUN date +%Y%m%d
+
 ARG UID=1000
 ARG GID=1000
 ENV DEBIAN_FRONTEND=noninteractive
