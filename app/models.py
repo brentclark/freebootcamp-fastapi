@@ -53,8 +53,8 @@ class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, nullable=False)
     email = Column(EmailType, nullable=False, unique=True)
-    salt = Column(String, nullable=False, default="")
-    password = Column(String, nullable=False, default="")
+    salt = Column(String(length=255), nullable=False, default="")
+    password = Column(String(255), nullable=False, default="")
     ptype = Column(Enum(PasswordType), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     # posts = relationship("Posts", back_populates="user", cascade="all, delete-orphan")
@@ -70,9 +70,9 @@ class Posts(Base):
     user_id = Column(
         Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
-    title = Column(String, nullable=False)
-    content = Column(String, nullable=False)
-    published = Column(Boolean, server_default="TRUE", nullable=False)
+    title = Column(String(length=255), nullable=False)
+    content = Column(String(255), nullable=False)
+    published = Column(Boolean, server_default="1", nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     # user = relationship("User", back_populates="posts")
     user = relationship("User")
