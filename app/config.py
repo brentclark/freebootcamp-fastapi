@@ -10,6 +10,11 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int
     SECRET_KEY: str
     ALGORITHM: str
+    MYSQL_DATABASE: str
+    MYSQL_USER: str
+    MYSQL_HOST: str
+    MYSQL_PASSWORD: str
+    MYSQL_RANDOM_ROOT_PASSWORD: str
 
 
 settings: Any = Settings()
