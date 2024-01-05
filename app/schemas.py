@@ -4,12 +4,19 @@ from datetime import datetime
 from typing import Optional
 
 
+class PasswordType(Enum):
+    """PasswordType"""
+
+    MD5 = "MD5"
+    SHA256 = "SHA256"
+    SHA1 = "SHA1"
+
 class UserCreate(BaseModel):
     """UserCreate"""
 
     email: EmailStr | None = Field(default=None)
     password: str
-    created_at: Optional[datetime] = datetime.now()
+    created_at: Optional[datetime] = datetime
 
     @validator("password", always=True)
     def validate_password1(cls, value: str):
@@ -47,15 +54,14 @@ class UserLogin(BaseModel):
     password: str
 
 
-
-
 class Post(BaseModel):
     """Post"""
+
     id: int
     title: str
     content: str
     published: Optional[bool] = True
-    created_at: Optional[datetime] = datetime.now()
+    created_at: Optional[datetime] = datetime
     user_id: Optional[int]
     user: Optional[UserResponse]
 
@@ -65,10 +71,11 @@ class Post(BaseModel):
 
 class PostCreate(BaseModel):
     """PostCreate"""
+
     title: str
     content: str
     published: Optional[bool] = True
-    created_at: Optional[datetime] = datetime.now()
+    created_at: Optional[datetime] = datetime
 
 
 class PostUpdate(Post):
@@ -123,8 +130,10 @@ class Vote(BaseModel):
     post_id: int
     direction: VoteDirection
 
+
 class PostOut(BaseModel):
     """Post"""
+
     Posts: Post
     votes: int
 
