@@ -4,6 +4,7 @@ from sqlalchemy.sql.expression import text
 from sqlalchemy_utils import EmailType, PasswordType
 from sqlalchemy.orm import relationship
 from .database import Base
+from .schemas import PasswordType
 from sqlalchemy.sql import func
 
 import enum
