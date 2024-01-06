@@ -11,12 +11,13 @@ class PasswordType(Enum):
     SHA256 = "SHA256"
     SHA1 = "SHA1"
 
+
 class UserCreate(BaseModel):
     """UserCreate"""
 
     email: EmailStr | None = Field(default=None)
     password: str
-    created_at: Optional[datetime] = datetime
+    created_time: datetime
     ptype: PasswordType = PasswordType.SHA256
 
     @validator("password", always=True)
