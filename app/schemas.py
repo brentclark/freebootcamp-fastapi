@@ -17,6 +17,7 @@ class UserCreate(BaseModel):
     email: EmailStr | None = Field(default=None)
     password: str
     created_at: Optional[datetime] = datetime
+    ptype: PasswordType = PasswordType.SHA256
 
     @validator("password", always=True)
     def validate_password1(cls, value: str):
