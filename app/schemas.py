@@ -4,21 +4,12 @@ from datetime import datetime
 from typing import Optional
 
 
-class PasswordType(Enum):
-    """PasswordType"""
-
-    MD5 = "MD5"
-    SHA256 = "SHA256"
-    SHA1 = "SHA1"
-
-
 class UserCreate(BaseModel):
     """UserCreate"""
 
     email: EmailStr | None = Field(default=None)
     password: str
-    created_time: datetime
-    ptype: PasswordType = PasswordType.SHA256
+    created_at: datetime = datetime.now()
 
     @validator("password", always=True)
     def validate_password1(cls, value: str):
