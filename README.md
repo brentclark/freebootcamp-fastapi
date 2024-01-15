@@ -13,6 +13,8 @@ uvicorn app.main:app --reload
 
 python3 -m pip list -o | awk '{if(NR>=3)print}'
 python3 -m pip list -o | awk '{if(NR>=3)print}' | cut -d' ' -f1 | xargs -n1 python3 -m pip install --upgrade --force-reinstall
+
+alembic downgrade base
 ```
 
 ## Docker Commnand
