@@ -3,7 +3,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, engine
 from sqlalchemy.orm import sessionmaker
-from faker import Faker
+import faker 
 
 from app.oauth2 import create_access_token
 from app.config import settings
@@ -34,13 +34,13 @@ client = TestClient(app)
 #        yield TestClient(app)
 #    finally:
 #        db.close()
-
-
+@pytest.mark.parametrize(
+    ("email", "password"), (faker.company_email(), faker.password(length=25))
+)
 def test_create_user():
-    faker = Faker()
     response = client.post(
         "/users",
-        json={"email": faker.company_email(), "password": faker.password(length=25)},
+        json={"email": email, "password": password},
     )
     assert response.status_code == 201
 
@@ -52,12 +52,13 @@ def test_get_users():
     assert response.status_code == 200
     print(response.json())
 
+
 def test_get_user_with_id_1():
     response = client.get(
         "/users/1",
     )
     assert response.status_code == 200
-    assert response.json().get('id') == 1
-    assert response.json().get('email') is not None
-    assert response.json().get('created_at') is not None
+    assert response.json().get("id") == 1
+    assert response.json().get("email") is not None
+    assert response.json().get("created_at") is not None
     print(response.json())
