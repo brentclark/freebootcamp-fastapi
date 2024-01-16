@@ -1,11 +1,9 @@
-from typing import Generator
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine, engine
 from sqlalchemy.orm import sessionmaker
 from faker import Faker
 
-from app.oauth2 import create_access_token
+#from app.oauth2 import create_access_token
 from app.database import engine, Base
 from app.schemas import UserResponse
 from app.main import app

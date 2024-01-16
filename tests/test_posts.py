@@ -1,6 +1,6 @@
+from datetime import datetime
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine, engine
 from sqlalchemy.orm import sessionmaker
 from faker import Faker
 
@@ -8,7 +8,6 @@ from app.oauth2 import create_access_token
 from app.database import engine, Base
 from app.schemas import UserResponse, PostCreateResponse
 from app.main import app
-from datetime import datetime
 
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base.metadata.create_all(bind=engine)
@@ -39,6 +38,7 @@ def test_posts_by_user(email, password):
         "user_id": user_response.id,
     }
     token_data = create_access_token(data=user_data)
+    assert token_data is not None
     print(f"\n{token_data=}")
 
     # Create a post
