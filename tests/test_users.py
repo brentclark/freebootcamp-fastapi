@@ -6,7 +6,6 @@ from sqlalchemy.orm import sessionmaker
 from faker import Faker
 
 from app.oauth2 import create_access_token
-from app.config import settings
 from app.database import engine, Base
 from app.schemas import UserResponse
 from app.main import app
@@ -29,7 +28,7 @@ def is_valid_email(email):
     ("email", "password", "status"),
     ((Faker().company_email(), Faker().password(length=25), 201),),
 )
-def test_create_user(email, password, status):
+def test_create_user(email: str, password: str, status: int):
     response = client.post(
         "/users",
         json={"email": email, "password": password},
@@ -50,14 +49,15 @@ def test_get_users():
     print(response.json())
 
 
-def test_get_user_with_id_1():
+@pytest.mark.parametrize(("id", "status_code"), ((2, 200),))
+def test_get_user_with_id_1(id: int, status_code: int):
     response = client.get(
-        "/users/1",
+        f"/users/{id}",
     )
     print(response.json())
 
-    assert response.status_code == 200
-    assert response.json().get("id") == 1
+    assert response.status_code == status_code
+    assert response.json().get("id") == id
     assert response.json().get("email") is not None
     assert response.json().get("created_at") is not None
 
@@ -67,4 +67,3 @@ def test_get_user_with_id_1():
     assert (
         is_valid_email(user_response.email) != None
     ), f"Expected {user_response.email}, i.e. Does not match"
-
