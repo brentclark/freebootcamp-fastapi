@@ -47,6 +47,12 @@ def create_user(client):
     print(f"Creating User: {TEST_USER_SIGNUP=}")
     response = client.post("/users", json=TEST_USER_SIGNUP)
     assert response.status_code == 201
+
+    user_response = UserResponse(**response.json())
+    assert user_response.email == TEST_USER_SIGNUP["email"]
+    assert isinstance(user_response.id, int)
+    assert isinstance(user_response.created_at, datetime)
+
     return response
 
 

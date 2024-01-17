@@ -13,44 +13,31 @@ def is_valid_email(email):
     return re.match(pattern, email)
 
 
-@pytest.mark.parametrize(
-    ("email", "password", "status"),
-    ((Faker().company_email(), Faker().password(length=25), 201),),
-)
-def test_create_user(client: TestClient, email: str, password: str, status: int):
-    response = client.post(
-        "/users",
-        json={"email": email, "password": password},
-    )
-    user_response = UserResponse(**response.json())
-
-    assert response.status_code == status
-    assert user_response.email == email
-    assert isinstance(user_response.id, int)
-    assert isinstance(user_response.created_at, datetime)
-
-
 def test_get_users(client: TestClient):
     response = client.get(
         "/users",
     )
     assert response.status_code == 200
-    print(response.json())
+    # print(response.json())
 
 
-@pytest.mark.parametrize(("id", "status_code"), ((2, 200),))
-def test_get_user_with_id_1(client: TestClient, id: int, status_code: int):
+def test_get_user_by_id(create_user, client: TestClient):
+    create_user = create_user
+    create_user_response = UserResponse(**create_user.json())
+
+    assert isinstance(create_user_response.id, int)
+    assert isinstance(create_user_response.created_at, datetime)
+
     response = client.get(
-        f"/users/{id}",
+        f"/users/{create_user_response.id}",
     )
-    print(response.json())
-
-    assert response.status_code == status_code
-    assert response.json().get("id") == id
-    assert response.json().get("email") is not None
-    assert response.json().get("created_at") is not None
+    #print(response.json())
 
     user_response = UserResponse(**response.json())
+
+    assert response.status_code == 200
+    assert user_response.id == create_user_response.id
+    assert user_response.email == create_user_response.email
     assert isinstance(user_response.id, int)
     assert isinstance(user_response.created_at, datetime)
     assert (
