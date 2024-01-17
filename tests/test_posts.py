@@ -1,59 +1,54 @@
 from datetime import datetime
 import pytest
 from fastapi.testclient import TestClient
-
 from faker import Faker
-
-from app.oauth2 import create_access_token
-from app.schemas import UserResponse, PostCreateResponse
+from app.schemas import PostCreateResponse, PostOut
 
 
 @pytest.mark.parametrize(
-    ("email", "password"),
-    ((Faker().company_email(), Faker().password(length=25)),),
+    ("title", "content", "published"),
+    (
+        (
+            Faker().company_email(),
+            Faker().password(length=25),
+            Faker().random_element(elements=("True", "False")),
+        ),
+    ),
 )
-def test_posts_by_user(client: TestClient, email, password):
-    # First create user
-    response = client.post(
-        "/users",
-        json={"email": email, "password": password},
-    )
-    user_response = UserResponse(**response.json())
+@pytest.mark.testclient
+def test_posts_by_user(
+    create_user_return_header_with_access_token,
+    client: TestClient,
+    title,
+    content,
+    published,
+):
+    # Create test user and get token
+    headers = create_user_return_header_with_access_token
 
-    assert response.status_code == 201
-    assert user_response.email == email
-    assert isinstance(user_response.id, int)
-    assert isinstance(user_response.created_at, datetime)
-
-    # Create access Token
-    user_data = {
-        "user_email": user_response.email,
-        "user_id": user_response.id,
+    payload = {
+        "title": title,
+        "content": content,
+        "published": published,
     }
-    token_data = create_access_token(data=user_data)
-    assert token_data is not None
-    print(f"\n{token_data=}")
 
     # Create a post
-    headers = {}
-    payload = {
-        "title": Faker().sentence(nb_words=4),
-        "content": Faker().sentence(nb_words=4),
-        "published": Faker().random_element(elements=("True", "False")),
-    }
-    headers["Authorization"] = "Bearer " + token_data
     response = client.post("/posts", headers=headers, json=payload)
     assert response.status_code == 201
 
     post_response = PostCreateResponse(**response.json())
-    print(post_response)
+
     assert isinstance(post_response.id, int)
     assert isinstance(post_response.title, str)
     assert isinstance(post_response.created_at, datetime)
 
+
+@pytest.mark.testclient
+def test_get_all_posts(create_user_return_header_with_access_token, client: TestClient):
+    # Create test user and get token
+    headers = create_user_return_header_with_access_token
+
     # Get all posts
-    headers = {}
-    headers["Authorization"] = "Bearer " + token_data
     response = client.get("/posts", headers=headers)
-    print(response.text)
+    print(response.json())
     assert response.status_code == 200
