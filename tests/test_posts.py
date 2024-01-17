@@ -9,8 +9,8 @@ from app.schemas import PostCreateResponse, PostOut
     ("title", "content", "published"),
     (
         (
-            Faker().company_email(),
-            Faker().password(length=25),
+            Faker().sentence(nb_words=4),
+            Faker().sentence(nb_words=4),
             Faker().random_element(elements=("True", "False")),
         ),
     ),
@@ -52,3 +52,18 @@ def test_get_all_posts(create_user_return_header_with_access_token, client: Test
     response = client.get("/posts", headers=headers)
     print(response.json())
     assert response.status_code == 200
+
+
+@pytest.mark.skip(reason="Cant delete post that it does not own")
+@pytest.mark.testclient
+def test_delete_a_post(create_user_return_header_with_access_token, client: TestClient):
+    # Create test user and get token
+    headers = create_user_return_header_with_access_token
+
+    # Get all posts
+    response = client.get("/posts", headers=headers)
+    assert response.status_code == 200
+
+    id = response.json()[0]["Posts"].get("id")
+    delete_response = client.delete(f"/posts/{id}", headers=headers)
+    print(delete_response)
