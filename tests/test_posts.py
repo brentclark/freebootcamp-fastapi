@@ -1,25 +1,18 @@
 from datetime import datetime
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy.orm import sessionmaker
+
 from faker import Faker
 
 from app.oauth2 import create_access_token
-from app.database import engine, Base
 from app.schemas import UserResponse, PostCreateResponse
-from app.main import app
-
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base.metadata.create_all(bind=engine)
-
-client = TestClient(app)
 
 
 @pytest.mark.parametrize(
     ("email", "password"),
     ((Faker().company_email(), Faker().password(length=25)),),
 )
-def test_posts_by_user(email, password):
+def test_posts_by_user(client: TestClient, email, password):
     # First create user
     response = client.post(
         "/users",

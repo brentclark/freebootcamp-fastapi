@@ -1,18 +1,9 @@
+from datetime import datetime
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy.orm import sessionmaker
 from faker import Faker
 
-#from app.oauth2 import create_access_token
-from app.database import engine, Base
 from app.schemas import UserResponse
-from app.main import app
-from datetime import datetime
-
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base.metadata.create_all(bind=engine)
-
-client = TestClient(app)
 
 
 def is_valid_email(email):
@@ -26,7 +17,7 @@ def is_valid_email(email):
     ("email", "password", "status"),
     ((Faker().company_email(), Faker().password(length=25), 201),),
 )
-def test_create_user(email: str, password: str, status: int):
+def test_create_user(client: TestClient, email: str, password: str, status: int):
     response = client.post(
         "/users",
         json={"email": email, "password": password},
@@ -39,7 +30,7 @@ def test_create_user(email: str, password: str, status: int):
     assert isinstance(user_response.created_at, datetime)
 
 
-def test_get_users():
+def test_get_users(client: TestClient):
     response = client.get(
         "/users",
     )
@@ -48,7 +39,7 @@ def test_get_users():
 
 
 @pytest.mark.parametrize(("id", "status_code"), ((2, 200),))
-def test_get_user_with_id_1(id: int, status_code: int):
+def test_get_user_with_id_1(client: TestClient, id: int, status_code: int):
     response = client.get(
         f"/users/{id}",
     )
