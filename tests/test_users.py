@@ -13,12 +13,12 @@ def is_valid_email(email):
     return re.match(pattern, email)
 
 
-def test_get_users(client: TestClient):
+def test_get_users(create_user, client: TestClient):
     response = client.get(
         "/users",
     )
     assert response.status_code == 200
-    # print(response.json())
+    print(response.json())
 
 
 def test_get_user_by_id(create_user, client: TestClient):

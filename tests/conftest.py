@@ -11,8 +11,13 @@ from app.schemas import UserResponse
 from datetime import datetime
 from faker import Faker
 
+#from alembic import command
+#from alembic.config import Config
+
+# Load the Alembic configuration
+#alembic_cfg = Config("../alembic.ini")
+
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base.metadata.create_all(bind=engine)
 
 client = TestClient(app)
 
@@ -23,13 +28,17 @@ client = TestClient(app)
 
 @pytest.fixture(scope="session")
 def db():
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+    #command.upgrade(alembic_cfg, "base")
+    #command.upgrade(alembic_cfg, "head")
+
     yield TestingSessionLocal()
 
 
 @pytest.fixture(scope="session")
 def client(db) -> Generator:
     try:
-        TestClient(app)
         yield TestClient(app)
     finally:
         db.close()
