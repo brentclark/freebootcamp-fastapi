@@ -11,11 +11,11 @@ from app.schemas import UserResponse
 from datetime import datetime
 from faker import Faker
 
-#from alembic import command
-#from alembic.config import Config
+# from alembic import command
+# from alembic.config import Config
 
 # Load the Alembic configuration
-#alembic_cfg = Config("../alembic.ini")
+# alembic_cfg = Config("../alembic.ini")
 
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
@@ -27,21 +27,22 @@ client = TestClient(app)
 
 
 @pytest.fixture(scope="session")
-def db():
+def db_session() -> Generator:
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
-    #command.upgrade(alembic_cfg, "base")
-    #command.upgrade(alembic_cfg, "head")
+    # command.upgrade(alembic_cfg, "base")
+    # command.upgrade(alembic_cfg, "head")
 
-    yield TestingSessionLocal()
+    db = TestingSessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 @pytest.fixture(scope="session")
-def client(db) -> Generator:
-    try:
-        yield TestClient(app)
-    finally:
-        db.close()
+def client(db_session) -> Generator:
+    yield TestClient(app)
 
 
 TEST_USER_SIGNUP = {
