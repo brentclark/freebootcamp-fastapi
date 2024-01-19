@@ -63,15 +63,13 @@ def create_user(client):
     assert isinstance(user_response.id, int)
     assert isinstance(user_response.created_at, datetime)
 
-    return response
+    return user_response
 
 
 @pytest.fixture(scope="function")
 def create_user_return_create_access_token(create_user):
-    response = create_user
-    user_response = UserResponse(**response.json())
+    user_response = create_user
 
-    assert response.status_code == 201
     assert user_response.email == TEST_USER_SIGNUP["email"]
     assert isinstance(user_response.id, int)
     assert isinstance(user_response.created_at, datetime)

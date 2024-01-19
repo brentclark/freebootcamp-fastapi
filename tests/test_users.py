@@ -22,8 +22,7 @@ def test_get_users(create_user, client: TestClient):
 
 
 def test_get_user_by_id(create_user, client: TestClient):
-    create_user = create_user
-    create_user_response = UserResponse(**create_user.json())
+    create_user_response = create_user
 
     assert isinstance(create_user_response.id, int)
     assert isinstance(create_user_response.created_at, datetime)
