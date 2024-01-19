@@ -28,7 +28,7 @@ client = TestClient(app)
 
 @pytest.fixture(scope="session")
 def db_session() -> Generator:
-    Base.metadata.drop_all(bind=engine)
+    #Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
     # command.upgrade(alembic_cfg, "base")
     # command.upgrade(alembic_cfg, "head")

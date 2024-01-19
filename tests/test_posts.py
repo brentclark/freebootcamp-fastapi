@@ -3,6 +3,7 @@ import pytest
 from fastapi.testclient import TestClient
 from faker import Faker
 from app.schemas import PostCreateResponse, PostOut
+from app import models
 
 
 @pytest.mark.parametrize(
@@ -54,9 +55,12 @@ def test_get_all_posts(create_user_return_header_with_access_token, client: Test
     assert response.status_code == 200
 
 
-@pytest.mark.skip(reason="Cant delete post that it does not own")
+#@pytest.mark.skip(reason="Cant delete post that it does not own")
 @pytest.mark.testclient
-def test_delete_a_post(create_user_return_header_with_access_token, client: TestClient):
+def test_delete_a_post(create_user_return_header_with_access_token, client: TestClient, db_session):
+
+    print(db_session.query(models.Posts))
+
     # Create test user and get token
     headers = create_user_return_header_with_access_token
 
