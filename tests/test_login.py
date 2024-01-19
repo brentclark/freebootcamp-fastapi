@@ -2,7 +2,9 @@ from datetime import datetime
 import pytest
 from fastapi.testclient import TestClient
 from app.oauth2 import create_access_token
+from app.config import settings
 from faker import Faker
+from jose import jwt
 
 from app.schemas import UserResponse, Token
 
@@ -15,7 +17,6 @@ TEST_USER_SIGNUP = {
 @pytest.fixture(scope="function")
 def test_create_user(client: TestClient):
     # Create User
-    print(f"Creating User: {TEST_USER_SIGNUP=}")
     response = client.post("/users", json=TEST_USER_SIGNUP)
     assert response.status_code == 201
 
@@ -50,5 +51,14 @@ def test_login(test_create_user, client: TestClient):
         "user_id": test_create_user.id,
     }
 
+    # Test access token
     token_data = create_access_token(data=user_data)
     assert token_data == auth_response.access_token
+
+    # Decode and test access token
+    token_data_decoded = jwt.decode(
+        auth_response.access_token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+    )
+    assert token_data_decoded['user_email'] == test_create_user.email
+    assert token_data_decoded['user_id'] == test_create_user.id
+    assert isinstance(token_data_decoded['exp'], int)
