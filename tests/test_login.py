@@ -29,12 +29,11 @@ def test_create_user(client: TestClient):
 
 
 def test_login(test_create_user, client: TestClient):
-    headers = {}
     data = {
         "username": TEST_USER_SIGNUP["email"],
         "password": TEST_USER_SIGNUP["password"],
     }
-    response = client.post("/login", data=data, headers=headers)
+    response = client.post("/login", data=data)
     assert response.status_code == 200
 
     assert isinstance(test_create_user.id, int)
@@ -62,3 +61,33 @@ def test_login(test_create_user, client: TestClient):
     assert token_data_decoded["user_email"] == test_create_user.email
     assert token_data_decoded["user_id"] == test_create_user.id
     assert isinstance(token_data_decoded["exp"], int)
+
+
+@pytest.mark.parametrize(
+    ("email","password", "status_code"), [
+        (
+            Faker().company_email(),
+            Faker().password(length=25),
+            403
+        ),
+        (
+            None,
+            Faker().password(length=25),
+            422
+        ),
+        (
+            Faker().company_email(),
+            None,
+            422
+        ),
+
+    ]
+)
+def test_incorrect_login(client: TestClient, email, password, status_code):
+    data = {
+        "username": email,
+        "password": password,
+    }
+
+    response = client.post("/login", data=data)
+    assert response.status_code == status_code
