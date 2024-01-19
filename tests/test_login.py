@@ -59,6 +59,6 @@ def test_login(test_create_user, client: TestClient):
     token_data_decoded = jwt.decode(
         auth_response.access_token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
     )
-    assert token_data_decoded['user_email'] == test_create_user.email
-    assert token_data_decoded['user_id'] == test_create_user.id
-    assert isinstance(token_data_decoded['exp'], int)
+    assert token_data_decoded["user_email"] == test_create_user.email
+    assert token_data_decoded["user_id"] == test_create_user.id
+    assert isinstance(token_data_decoded["exp"], int)
