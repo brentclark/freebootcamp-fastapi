@@ -66,7 +66,7 @@ def create_user(client):
     return user_response
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session")
 def create_user_return_create_access_token(create_user):
     user_response = create_user
 
@@ -87,7 +87,7 @@ def create_user_return_create_access_token(create_user):
     return token_data
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session")
 def create_user_return_header_with_access_token(create_user_return_create_access_token):
     # Create test user and get token
     token_data = create_user_return_create_access_token

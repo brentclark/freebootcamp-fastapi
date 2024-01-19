@@ -8,7 +8,7 @@ from app.schemas import UserResponse, Token
 
 TEST_USER_SIGNUP = {
     "email": Faker().company_email(),
-    "password": Faker().password(length=25) + "BRENT",
+    "password": Faker().password(length=25),
 }
 
 
